@@ -6,11 +6,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -30,8 +30,8 @@ public class Converter {
         this.gson = new Gson();
     }
 
-    public List<String> getSupportedCurrencies() throws IOException, InterruptedException {
-        String path = "/latest/USD";
+    public Map<String, String> getSupportedCurrencies() throws IOException, InterruptedException {
+        String path = "/codes";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(this.BASE_URL + path))
@@ -39,11 +39,12 @@ public class Converter {
 
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
         JsonObject result = gson.fromJson(response.body(), JsonObject.class);
-        JsonObject conversionRatesObject = result.get("conversion_rates").getAsJsonObject();
+        JsonArray conversionRatesArray = result.get("supported_codes").getAsJsonArray();
 
-        List<String> conversionRates = new ArrayList<>();
-        for (Map.Entry<String, JsonElement> entry : conversionRatesObject.entrySet()) {
-            conversionRates.add(entry.getKey());
+        Map<String, String> conversionRates = new HashMap<>();
+        for (JsonElement entry : conversionRatesArray) {
+            JsonArray array = entry.getAsJsonArray();
+            conversionRates.put(array.get(0).getAsString(), array.get(1).getAsString());
         }
 
         return conversionRates;

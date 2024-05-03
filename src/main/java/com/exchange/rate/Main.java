@@ -1,6 +1,10 @@
 package com.exchange.rate;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -27,9 +31,10 @@ public class Main {
         return amount;
     }
 
-    public static String getCurrencyCodeFromUser(String message, List<String> supportedCurrencies, Scanner scanner) {
+    public static String getCurrencyCodeFromUser(String message, Map<String, String> supportedCurrencies,
+            Scanner scanner) {
         String userInput = "";
-        while (true) {
+        while (!(supportedCurrencies.get(userInput.toUpperCase()) != null)) {
             System.out.print(message);
 
             userInput = scanner.nextLine();
@@ -38,11 +43,11 @@ public class Main {
                 break;
             }
 
-            if (supportedCurrencies.contains(userInput.toUpperCase())) {
-                break;
-            } else {
+            if (supportedCurrencies.get(userInput.toUpperCase()) == null) {
+                List<Map.Entry<String, String>> sortedEntries = new ArrayList<>(supportedCurrencies.entrySet());
+                Collections.sort(sortedEntries, Comparator.comparing(Map.Entry::getKey));
                 System.out.println("Invalid input. Please provide a valid code.");
-                System.out.println("Valid codes are: " + String.join(", ", supportedCurrencies + "."));
+                System.out.println("Valid codes are: " + String.join(", ", sortedEntries + "."));
             }
         }
 
@@ -57,7 +62,7 @@ public class Main {
         double amount = 0;
 
         try {
-            List<String> supportedCurrencies = converter.getSupportedCurrencies();
+            Map<String, String> supportedCurrencies = converter.getSupportedCurrencies();
             String helper = "Type in a currency code (Press Enter to Exit): ";
 
             String startMenu = "Welcome to the Currency Converter App.\nChoose a currency to convert.";
