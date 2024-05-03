@@ -1,6 +1,5 @@
 package com.exchange.rate;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -43,53 +42,54 @@ public class Main {
                 break;
             } else {
                 System.out.println("Invalid input. Please provide a valid code.");
+                System.out.println("Valid codes are: " + String.join(", ", supportedCurrencies + "."));
             }
         }
-        return userInput;
+
+        return userInput.toUpperCase();
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Converter converter = new Converter();
         String from;
         String to;
         double amount = 0;
-        Converter converter = new Converter();
-        List<String> supportedCurrencies = converter.getSupportedCurrencies();
-        Scanner scanner = new Scanner(System.in);
-        String helper = "Type in a currency code (Press Enter to Exit): ";
 
-        String startMenu = """
-                Welcome to the Currency Converter App.
-                Please choose from the following currencies to convert:
-                %s""".formatted(String.join(", ", supportedCurrencies));
+        try {
+            List<String> supportedCurrencies = converter.getSupportedCurrencies();
+            String helper = "Type in a currency code (Press Enter to Exit): ";
 
-        String continueMenu = """
-                Now choose a target currency to convert to:
-                %s""".formatted(String.join(", ", supportedCurrencies));
+            String startMenu = "Welcome to the Currency Converter App.\nChoose a currency to convert.";
 
-        String selectedCurrencies = """
-                You chose to convert from %s to %s""";
+            String continueMenu = "Now choose a target currency to convert to.";
 
-        while (true) {
-            System.out.println(startMenu);
-            from = getCurrencyCodeFromUser(helper, supportedCurrencies, scanner);
-            if (from.isEmpty()) {
-                System.out.println("Exiting...");
-                break;
+            String selectedCurrencies = "You chose to convert from %s to %s.";
+
+            while (true) {
+                System.out.println(startMenu);
+                from = getCurrencyCodeFromUser(helper, supportedCurrencies, scanner);
+                if (from.isEmpty()) {
+                    System.out.println("Exiting...");
+                    break;
+                }
+
+                System.out.println(continueMenu);
+                to = getCurrencyCodeFromUser(helper, supportedCurrencies, scanner);
+                if (to.isEmpty()) {
+                    System.out.println("Exiting...");
+                    break;
+                }
+
+                System.out.println(selectedCurrencies.formatted(from, to));
+                amount = getAmountFromUser("Enter the amount: ", scanner);
+                ConversionInfo conversionResult = converter.getExchangeRate(from, to, amount);
+                System.out.println(conversionResult);
             }
-
-            System.out.println(continueMenu);
-            to = getCurrencyCodeFromUser(helper, supportedCurrencies, scanner);
-            if (to.isEmpty()) {
-                System.out.println("Exiting...");
-                break;
-            }
-
-            System.out.println(selectedCurrencies.formatted(from, to));
-            amount = getAmountFromUser("Enter the amount: ", scanner);
-            double conversionResult = converter.getExchangeRate(from, to, amount);
-            System.out.println(
-                    "%.4f %s is equal to %.4f %s".formatted(amount, from, conversionResult, to));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
+
         scanner.close();
     }
 }

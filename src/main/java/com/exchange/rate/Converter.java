@@ -49,7 +49,8 @@ public class Converter {
         return conversionRates;
     }
 
-    public double getExchangeRate(String from, String to, double amount) throws IOException, InterruptedException {
+    public ConversionInfo getExchangeRate(String from, String to, double amount)
+            throws IOException, InterruptedException {
         String path = "/pair/%s/%s/%f".formatted(from, to, amount);
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -61,7 +62,7 @@ public class Converter {
         ConversionResult result = gson.fromJson(response.body(), ConversionResult.class);
 
         if (result.result().equals("success")) {
-            return result.conversion_result();
+            return new ConversionInfo(result, amount);
         }
 
         throw new ConversionExeption("An error ocurred while trying to make the conversion.");
