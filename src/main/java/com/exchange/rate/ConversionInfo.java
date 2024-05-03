@@ -22,7 +22,7 @@ public class ConversionInfo {
                 .withZone(ZoneId.systemDefault());
         Instant instant = Instant.ofEpochSecond(this.conversionResult.time_last_update_unix());
         String dateFormatted = formatter.format(instant);
-        return "At an exchange rate rate of %.4f, %.2f %s is equivalent to %.2f %s (updated %s).".formatted(
+        return "At an exchange rate of %.4f, %.2f %s is equivalent to %.2f %s (updated %s).".formatted(
                 this.conversionResult.conversion_rate(),
                 this.amount,
                 this.conversionResult.base_code(),
